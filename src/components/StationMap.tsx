@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState, useMemo } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import type { Gasolinera } from '../types/api'
@@ -37,6 +37,58 @@ function RecenterMap({ center }: { center: [number, number] }) {
   return null
 }
 
+function ViewportMarkers({
+  stations,
+  fuelType,
+}: {
+  stations: Gasolinera[]
+  fuelType: FuelType
+}) {
+  const map = useMap()
+  const [bounds, setBounds] = useState(() => map.getBounds())
+
+  useEffect(() => {
+    const update = () => setBounds(map.getBounds())
+    map.on('moveend', update)
+    map.on('zoomend', update)
+    return () => {
+      map.off('moveend', update)
+      map.off('zoomend', update)
+    }
+  }, [map])
+
+  const visible = useMemo(() => {
+    return stations.filter((s) => {
+      const price = s.prices[fuelType]
+      if (price == null) return false
+      return bounds.contains([s.coordinates.lat, s.coordinates.lng])
+    })
+  }, [stations, fuelType, bounds])
+
+  return (
+    <>
+      {visible.map((s) => {
+        const price = s.prices[fuelType]!
+        return (
+          <Marker
+            key={s.placeId}
+            position={[s.coordinates.lat, s.coordinates.lng]}
+            icon={createPriceIcon(price)}
+          >
+            <Popup>
+              <div>
+                <strong>{s.name}</strong>
+                <br />
+                {fuelType}: ${price.toFixed(2)}
+              </div>
+            </Popup>
+          </Marker>
+        )
+      })}
+    </>
+  )
+}
+
 interface Props {
   userCoords: { lat: number; lng: number }
   stations: Gasolinera[]
@@ -64,25 +116,7 @@ export function StationMap({ userCoords, stations, fuelType }: Props) {
           <Popup>Tu ubicación</Popup>
         </Marker>
 
-        {stations.map((s) => {
-          const price = s.prices[fuelType]
-          if (price == null) return null
-          return (
-            <Marker
-              key={s.placeId}
-              position={[s.coordinates.lat, s.coordinates.lng]}
-              icon={createPriceIcon(price)}
-            >
-              <Popup>
-                <div>
-                  <strong>{s.name}</strong>
-                  <br />
-                  {fuelType}: ${price.toFixed(2)}
-                </div>
-              </Popup>
-            </Marker>
-          )
-        })}
+        <ViewportMarkers stations={stations} fuelType={fuelType} />
       </MapContainer>
     </div>
   )
