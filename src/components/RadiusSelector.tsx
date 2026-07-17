@@ -6,7 +6,6 @@ const RADIUS_OPTIONS: { value: RadiusValue; label: string }[] = [
   { value: 5000, label: '5 km' },
   { value: 10000, label: '10 km' },
   { value: 15000, label: '15 km' },
-  { value: 20000, label: '20 km' },
 ]
 
 interface Props {
