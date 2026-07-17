@@ -1,8 +1,9 @@
-import { useRef, useState, useCallback, useEffect } from 'react'
+import { useRef, useState, useCallback, useEffect, useMemo } from 'react'
 import { Search, Droplets, RefreshCw } from 'lucide-react'
 import type { Gasolinera } from '../types/api'
 import type { FuelType } from '../stores/useFilters'
 import { StationCard } from './StationCard'
+import { VirtualList } from './VirtualList'
 import styles from './StationList.module.css'
 
 interface Props {
@@ -33,28 +34,30 @@ type SheetState = 'peek' | 'half' | 'full'
 const PEEK_HEIGHT = 140
 const HALF_RATIO = 0.5
 const FULL_RATIO = 0.85
+const CARD_HEIGHT = 80
 
 export function StationList({ stations, fuelType, userCoords, loading, onRefresh }: Props) {
   const sheetRef = useRef<HTMLDivElement>(null)
-  const contentRef = useRef<HTMLDivElement>(null)
   const [sheetState, setSheetState] = useState<SheetState>('peek')
   const touchStart = useRef({ y: 0, startTime: 0 })
   const [isDragging, setIsDragging] = useState(false)
 
-  const sorted = stations
-    .map((s) => ({
-      ...s,
-      distance: haversineDistance(
-        userCoords.lat, userCoords.lng,
-        s.coordinates.lat, s.coordinates.lng,
-      ),
-    }))
-    .sort((a, b) => {
-      const pa = a.prices[fuelType] ?? Infinity
-      const pb = b.prices[fuelType] ?? Infinity
-      if (pa !== pb) return pa - pb
-      return (a.distance ?? Infinity) - (b.distance ?? Infinity)
-    })
+  const sorted = useMemo(() => {
+    return stations
+      .map((s) => ({
+        ...s,
+        distance: haversineDistance(
+          userCoords.lat, userCoords.lng,
+          s.coordinates.lat, s.coordinates.lng,
+        ),
+      }))
+      .sort((a, b) => {
+        const pa = a.prices[fuelType] ?? Infinity
+        const pb = b.prices[fuelType] ?? Infinity
+        if (pa !== pb) return pa - pb
+        return (a.distance ?? Infinity) - (b.distance ?? Infinity)
+      })
+  }, [stations, fuelType, userCoords])
 
   const cheapest = sorted[0]?.prices[fuelType]
 
@@ -137,20 +140,22 @@ export function StationList({ stations, fuelType, userCoords, loading, onRefresh
         </button>
       </div>
 
-      <div ref={contentRef} className={styles.content}>
-        {loading && sorted.length === 0 ? (
-          <div className={styles.empty}>
-            <Search className={styles.emptyIcon} size={32} strokeWidth={1.5} />
-            <p>Buscando gasolineras...</p>
-          </div>
-        ) : sorted.length === 0 ? (
-          <div className={styles.empty}>
-            <Droplets className={styles.emptyIcon} size={32} strokeWidth={1.5} />
-            <p>No se encontraron gasolineras en esta área</p>
-          </div>
-        ) : (
-          <div className={styles.list}>
-            {sorted.map((s, i) => (
+      {loading && sorted.length === 0 ? (
+        <div className={styles.empty}>
+          <Search className={styles.emptyIcon} size={32} strokeWidth={1.5} />
+          <p>Buscando gasolineras...</p>
+        </div>
+      ) : sorted.length === 0 ? (
+        <div className={styles.empty}>
+          <Droplets className={styles.emptyIcon} size={32} strokeWidth={1.5} />
+          <p>No se encontraron gasolineras en esta área</p>
+        </div>
+      ) : (
+        <div className={styles.list}>
+          <VirtualList
+            items={sorted}
+            itemHeight={CARD_HEIGHT}
+            renderItem={(s, i) => (
               <StationCard
                 key={s.placeId}
                 station={s}
@@ -158,10 +163,10 @@ export function StationList({ stations, fuelType, userCoords, loading, onRefresh
                 rank={i + 1}
                 isCheapest={s.prices[fuelType] === cheapest && i === 0}
               />
-            ))}
-          </div>
-        )}
-      </div>
+            )}
+          />
+        </div>
+      )}
     </div>
   )
 }

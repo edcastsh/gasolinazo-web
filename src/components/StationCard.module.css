@@ -7,8 +7,6 @@
   background: var(--bg);
   border: 1px solid var(--border);
   transition: background 0.15s ease;
-  content-visibility: auto;
-  contain-intrinsic-size: auto 72px;
 }
 
 .card:active {

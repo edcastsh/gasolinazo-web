@@ -5,13 +5,19 @@ import type { Gasolinera } from '../types/api'
 import type { FuelType } from '../stores/useFilters'
 import styles from './StationMap.module.css'
 
+const priceIconCache = new Map<number, L.DivIcon>()
+
 function createPriceIcon(price: number) {
-  return L.divIcon({
+  const cached = priceIconCache.get(price)
+  if (cached) return cached
+  const icon = L.divIcon({
     className: '',
     html: `<div class="custom-marker">$${price.toFixed(2)}</div>`,
     iconSize: [60, 28],
     iconAnchor: [30, 14],
   })
+  priceIconCache.set(price, icon)
+  return icon
 }
 
 function createUserIcon() {
@@ -96,7 +102,10 @@ interface Props {
 }
 
 export function StationMap({ userCoords, stations, fuelType }: Props) {
-  const center: [number, number] = [userCoords.lat, userCoords.lng]
+  const center: [number, number] = useMemo(
+    () => [userCoords.lat, userCoords.lng],
+    [userCoords.lat, userCoords.lng],
+  )
 
   return (
     <div className={styles.mapContainer}>
