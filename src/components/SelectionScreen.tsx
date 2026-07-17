@@ -15,20 +15,19 @@ type Step = 'fuel' | 'radius' | 'location'
 export function SelectionScreen({ onReady }: Props) {
   const { fuelType, radius, setFuelType, setRadius, setCoords } = useFilters()
   const { coords, loading, error, requestLocation } = useGeolocation()
-  const requestedRef = useRef(false)
+  const locationRequestedRef = useRef(false)
 
   const step: Step = !fuelType ? 'fuel' : 'radius'
 
   useEffect(() => {
-    if (step === 'radius' && !requestedRef.current && !loading && !error && !coords) {
-      requestedRef.current = true
-      setTimeout(() => requestLocation(), 200)
+    if (step === 'radius' && !locationRequestedRef.current) {
+      locationRequestedRef.current = true
+      requestLocation()
     }
-  }, [step, loading, error, coords, requestLocation])
+  }, [step, requestLocation])
 
   useEffect(() => {
-    if (coords && !requestedRef.current) {
-      requestedRef.current = true
+    if (coords) {
       setCoords(coords)
       onReady()
     }
@@ -85,7 +84,7 @@ export function SelectionScreen({ onReady }: Props) {
                 <button
                   className={styles.retryBtn}
                   onClick={() => {
-                    requestedRef.current = false
+                    locationRequestedRef.current = false
                     requestLocation()
                   }}
                   type="button"
