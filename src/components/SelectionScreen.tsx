@@ -1,4 +1,5 @@
-import { Fuel, Check } from 'lucide-react'
+import { useEffect, useRef } from 'react'
+import { Fuel } from 'lucide-react'
 import { useFilters, type FuelType, type RadiusValue } from '../stores/useFilters'
 import { useGeolocation } from '../hooks/useGeolocation'
 import { FuelTypeSelector } from './FuelTypeSelector'
@@ -9,9 +10,29 @@ interface Props {
   onReady: () => void
 }
 
+type Step = 'fuel' | 'radius' | 'location'
+
 export function SelectionScreen({ onReady }: Props) {
   const { fuelType, radius, setFuelType, setRadius, setCoords } = useFilters()
   const { coords, loading, error, requestLocation } = useGeolocation()
+  const requestedRef = useRef(false)
+
+  const step: Step = !fuelType ? 'fuel' : 'radius'
+
+  useEffect(() => {
+    if (step === 'radius' && !requestedRef.current && !loading && !error && !coords) {
+      requestedRef.current = true
+      setTimeout(() => requestLocation(), 200)
+    }
+  }, [step, loading, error, coords, requestLocation])
+
+  useEffect(() => {
+    if (coords && !requestedRef.current) {
+      requestedRef.current = true
+      setCoords(coords)
+      onReady()
+    }
+  }, [coords, setCoords, onReady])
 
   const handleFuelSelect = (type: FuelType) => {
     setFuelType(type)
@@ -20,17 +41,6 @@ export function SelectionScreen({ onReady }: Props) {
   const handleRadiusSelect = (r: RadiusValue) => {
     setRadius(r)
   }
-
-  const handleContinue = () => {
-    if (coords) {
-      setCoords(coords)
-      onReady()
-    } else {
-      requestLocation()
-    }
-  }
-
-  const canContinue = fuelType !== null
 
   return (
     <div className={styles.container}>
@@ -43,37 +53,48 @@ export function SelectionScreen({ onReady }: Props) {
           </p>
         </div>
 
-        <div className={styles.section}>
-          <h2 className={styles.sectionTitle}>Tipo de gasolina</h2>
-          <FuelTypeSelector selected={fuelType} onSelect={handleFuelSelect} />
-        </div>
+        {step === 'fuel' && (
+          <div className={styles.step} key="fuel">
+            <div className={styles.section}>
+              <h2 className={styles.sectionTitle}>¿Qué tipo de gasolina buscas?</h2>
+              <FuelTypeSelector selected={fuelType} onSelect={handleFuelSelect} />
+            </div>
+          </div>
+        )}
 
-        <div className={styles.section}>
-          <h2 className={styles.sectionTitle}>Radio de búsqueda</h2>
-          <RadiusSelector selected={radius} onSelect={handleRadiusSelect} />
-        </div>
+        {step === 'radius' && (
+          <div className={styles.step} key="radius">
+            <div className={styles.section}>
+              <h2 className={styles.sectionTitle}>¿A qué distancia?</h2>
+              <RadiusSelector selected={radius} onSelect={handleRadiusSelect} />
+            </div>
+          </div>
+        )}
 
-        {error && <p className={styles.error}>{error}</p>}
-
-        <button
-          className={styles.button}
-          onClick={handleContinue}
-          disabled={!canContinue || loading}
-          type="button"
-        >
-          {loading ? (
-            <span className={styles.spinner} />
-          ) : coords ? (
-            'Buscar gasolineras'
-          ) : (
-            'Usar mi ubicación'
-          )}
-        </button>
-
-        {coords && !error && (
-          <p className={styles.locationOk}>
-            Ubicación obtenida <Check size={14} className={styles.checkIcon} />
-          </p>
+        {(loading || error) && (
+          <div className={styles.locationStep}>
+            {loading && (
+              <div className={styles.locationStatus}>
+                <span className={styles.spinner} />
+                <p>Obteniendo tu ubicación...</p>
+              </div>
+            )}
+            {error && (
+              <div className={styles.locationStatus}>
+                <p className={styles.error}>{error}</p>
+                <button
+                  className={styles.retryBtn}
+                  onClick={() => {
+                    requestedRef.current = false
+                    requestLocation()
+                  }}
+                  type="button"
+                >
+                  Reintentar
+                </button>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>
