@@ -7,6 +7,8 @@
   background: var(--bg);
   border: 1px solid var(--border);
   transition: background 0.15s ease;
+  width: 100%;
+  text-align: left;
 }
 
 .card:active {
@@ -83,10 +85,11 @@
   color: var(--text-muted);
 }
 
-.priceBlock {
+.navBlock {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  gap: 4px;
   flex-shrink: 0;
 }
 
@@ -101,7 +104,10 @@
   color: var(--success);
 }
 
-.priceLabel {
-  font-size: 11px;
-  color: var(--text-muted);
+.navIcon {
+  color: var(--accent);
+}
+
+.cheapest .navIcon {
+  color: var(--success);
 }
