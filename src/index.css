@@ -75,6 +75,7 @@ input {
   box-shadow: var(--shadow) !important;
   border-radius: var(--radius-sm) !important;
   overflow: hidden;
+  z-index: 1002 !important;
 }
 
 .leaflet-control-zoom a {
