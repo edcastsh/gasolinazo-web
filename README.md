@@ -1,75 +1,34 @@
-# React + TypeScript + Vite
+# Gasolinazo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Encuentra la gasolinera más barata cerca de ti.
 
-Currently, two official plugins are available:
+## Qué es
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Gasolinazo es una aplicación web móvil que te muestra en un mapa las gasolineras de tu zona ordenadas por precio. Selecciona el tipo de gasolina que necesitas, ajusta el radio de búsqueda y obtén al instante la opción más económica junto a tu ubicación.
 
-## React Compiler
+## Para quién es
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Para cualquier conductor en México que quiera ahorrar en cada carga de gasolina. Sin registros, sin complicaciones: abres la app, permites tu ubicación y listo.
 
-## Expanding the ESLint configuration
+## Cómo funciona
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1. Elige tu tipo de gasolina (regular, premium o diésel).
+2. Selecciona el radio de búsqueda (desde 2.5 km hasta 20 km).
+3. Comparte tu ubicación y el mapa te muestra las gasolineras cercanas ordenadas de más barata a más cara.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Stack
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- React + TypeScript + Vite
+- React-Leaflet para el mapa
+- TanStack Query para datos
+- Zustand para estado
+- Lucide para iconos
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Desarrollo
 
+```bash
+pnpm install
+pnpm dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
+La API debe estar corriendo en `localhost:3001`. Ver [gasolinazo-api](https://github.com/edcastsh/gasolinazo-api) para más detalles.
