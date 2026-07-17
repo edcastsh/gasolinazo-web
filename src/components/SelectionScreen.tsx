@@ -6,11 +6,7 @@ import { FuelTypeSelector } from './FuelTypeSelector'
 import { RadiusSelector } from './RadiusSelector'
 import styles from './SelectionScreen.module.css'
 
-interface Props {
-  onReady: () => void
-}
-
-export function SelectionScreen({ onReady }: Props) {
+export function SelectionScreen() {
   const { fuelType, radius, setFuelType, setRadius, setCoords } = useFilters()
   const { coords, loading, error, requestLocation } = useGeolocation()
   const [radiusConfirmed, setRadiusConfirmed] = useState(false)
@@ -18,9 +14,8 @@ export function SelectionScreen({ onReady }: Props) {
   useEffect(() => {
     if (coords) {
       setCoords(coords)
-      onReady()
     }
-  }, [coords, setCoords, onReady])
+  }, [coords, setCoords])
 
   const handleFuelSelect = (type: FuelType) => {
     setFuelType(type)
