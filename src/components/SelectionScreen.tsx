@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { Fuel } from 'lucide-react'
 import { useFilters, type FuelType, type RadiusValue } from '../stores/useFilters'
 import { useGeolocation } from '../hooks/useGeolocation'
@@ -10,21 +10,10 @@ interface Props {
   onReady: () => void
 }
 
-type Step = 'fuel' | 'radius' | 'location'
-
 export function SelectionScreen({ onReady }: Props) {
   const { fuelType, radius, setFuelType, setRadius, setCoords } = useFilters()
   const { coords, loading, error, requestLocation } = useGeolocation()
-  const locationRequestedRef = useRef(false)
-
-  const step: Step = !fuelType ? 'fuel' : 'radius'
-
-  useEffect(() => {
-    if (step === 'radius' && !locationRequestedRef.current) {
-      locationRequestedRef.current = true
-      requestLocation()
-    }
-  }, [step, requestLocation])
+  const [radiusConfirmed, setRadiusConfirmed] = useState(false)
 
   useEffect(() => {
     if (coords) {
@@ -39,6 +28,8 @@ export function SelectionScreen({ onReady }: Props) {
 
   const handleRadiusSelect = (r: RadiusValue) => {
     setRadius(r)
+    setRadiusConfirmed(true)
+    requestLocation()
   }
 
   return (
@@ -52,7 +43,7 @@ export function SelectionScreen({ onReady }: Props) {
           </p>
         </div>
 
-        {step === 'fuel' && (
+        {!fuelType && (
           <div className={styles.step} key="fuel">
             <div className={styles.section}>
               <h2 className={styles.sectionTitle}>¿Qué tipo de gasolina buscas?</h2>
@@ -61,7 +52,7 @@ export function SelectionScreen({ onReady }: Props) {
           </div>
         )}
 
-        {step === 'radius' && (
+        {fuelType && !radiusConfirmed && (
           <div className={styles.step} key="radius">
             <div className={styles.section}>
               <h2 className={styles.sectionTitle}>¿A qué distancia?</h2>
@@ -70,7 +61,7 @@ export function SelectionScreen({ onReady }: Props) {
           </div>
         )}
 
-        {(loading || error) && (
+        {radiusConfirmed && (loading || error) && (
           <div className={styles.locationStep}>
             {loading && (
               <div className={styles.locationStatus}>
@@ -83,10 +74,7 @@ export function SelectionScreen({ onReady }: Props) {
                 <p className={styles.error}>{error}</p>
                 <button
                   className={styles.retryBtn}
-                  onClick={() => {
-                    locationRequestedRef.current = false
-                    requestLocation()
-                  }}
+                  onClick={() => requestLocation()}
                   type="button"
                 >
                   Reintentar
