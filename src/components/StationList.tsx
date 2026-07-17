@@ -44,6 +44,7 @@ export function StationList({ stations, fuelType, userCoords, loading, onRefresh
 
   const sorted = useMemo(() => {
     return stations
+      .filter((s) => s.prices[fuelType] != null)
       .map((s) => ({
         ...s,
         distance: haversineDistance(
@@ -52,8 +53,8 @@ export function StationList({ stations, fuelType, userCoords, loading, onRefresh
         ),
       }))
       .sort((a, b) => {
-        const pa = a.prices[fuelType] ?? Infinity
-        const pb = b.prices[fuelType] ?? Infinity
+        const pa = a.prices[fuelType]!
+        const pb = b.prices[fuelType]!
         if (pa !== pb) return pa - pb
         return (a.distance ?? Infinity) - (b.distance ?? Infinity)
       })
