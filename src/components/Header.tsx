@@ -3,7 +3,7 @@ import { useFilters, type FuelType, type RadiusValue } from '../stores/useFilter
 import styles from './Header.module.css'
 
 interface Props {
-  onReset: () => void
+  onOpenFilters: () => void
 }
 
 const FUEL_LABELS: Record<FuelType, string> = {
@@ -16,7 +16,7 @@ function formatRadius(r: RadiusValue): string {
   return r >= 1000 ? `${r / 1000} km` : `${r} m`
 }
 
-export function Header({ onReset }: Props) {
+export function Header({ onOpenFilters }: Props) {
   const { fuelType, radius } = useFilters()
 
   return (
@@ -31,7 +31,7 @@ export function Header({ onReset }: Props) {
             {FUEL_LABELS[fuelType]} · {formatRadius(radius)}
           </span>
         )}
-        <button className={styles.iconBtn} onClick={onReset} type="button" title="Cambiar filtros">
+        <button className={styles.iconBtn} onClick={onOpenFilters} type="button" title="Cambiar filtros">
           <Settings size={18} strokeWidth={2} />
         </button>
       </div>
