@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.5.3](https://github.com/edcastsh/gasolinazo-web/compare/v0.5.2...v0.5.3) (2026-07-18)
+
+
+### Bug Fixes
+
+* **app:** take returning users straight to the map ([e68e567](https://github.com/edcastsh/gasolinazo-web/commit/e68e5671a4b029f05f8aff2479aea063001b820f))
+
 ## [0.5.2](https://github.com/edcastsh/gasolinazo-web/compare/v0.5.1...v0.5.2) (2026-07-18)
 
 
