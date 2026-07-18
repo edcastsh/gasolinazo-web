@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.5.1](https://github.com/edcastsh/gasolinazo-web/compare/v0.5.0...v0.5.1) (2026-07-18)
+
+
+### Features
+
+* **card:** open Google Maps or Apple Maps directions on station tap ([60d37e6](https://github.com/edcastsh/gasolinazo-web/commit/60d37e62d5edd60ed2e1a051924869eaa80f1f9d))
+* **store:** add localStorage persistence for fuel type and radius preferences ([8114f77](https://github.com/edcastsh/gasolinazo-web/commit/8114f7755b078782a3896499631d40ecfb74f990))
+* **ui:** add FilterModal bottom sheet for changing fuel type and radius ([1276393](https://github.com/edcastsh/gasolinazo-web/commit/12763936651400137e42b062fbf13d5fac9e2c67))
+* **ui:** add VirtualList component for scroll-based virtualization ([048f417](https://github.com/edcastsh/gasolinazo-web/commit/048f417314b05fc3e2d5a2d07f59f6666450ca3c))
+* **ui:** limit max search radius to 15km ([2592349](https://github.com/edcastsh/gasolinazo-web/commit/25923496671287915f05f1ce5db35af475e5cdf9))
+
+
+### Bug Fixes
+
+* **list:** filter out stations without price for selected fuel type ([2f6501f](https://github.com/edcastsh/gasolinazo-web/commit/2f6501fc6b42b7d5041c3607e063e29c86d59aab))
+* **list:** virtualize station list with @tanstack/react-virtual and sync with map viewport ([3da1f85](https://github.com/edcastsh/gasolinazo-web/commit/3da1f85abb9b542dabae2c281134cba9373f6918))
+* **map:** raise zoom control z-index above header ([6c26438](https://github.com/edcastsh/gasolinazo-web/commit/6c26438752d4c02ac014a4d4b62f8010c24b9795))
+* **onboarding:** auto-request location when both fuel and radius are selected ([0d838ce](https://github.com/edcastsh/gasolinazo-web/commit/0d838cececb2ec0583c6154a048ce7f2c9b557b5))
+* **onboarding:** only request location after user explicitly selects radius ([6f1eee5](https://github.com/edcastsh/gasolinazo-web/commit/6f1eee572bf1e8bcef74bf395abb5af98936cf75))
+* **onboarding:** separate location-requested ref from dashboard-ready effect so auto-advance works ([80aca7c](https://github.com/edcastsh/gasolinazo-web/commit/80aca7cc6efebe1c2e22a22fbd355c91d535a3d4))
+
 ## [0.5.0](https://github.com/edcastsh/gasolinazo-web/compare/v0.0.1...v0.5.0) (2026-07-17)
 
 
