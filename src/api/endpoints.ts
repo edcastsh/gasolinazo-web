@@ -12,9 +12,9 @@ export const fetchHistory = (placeId: string) =>
 
 export const fetchPrecios = (params: PreciosParams) => {
   const query = new URLSearchParams()
-  if (params.fuelType) query.set('tipo', params.fuelType)
-  if (params.from) query.set('desde', params.from)
-  if (params.to) query.set('hasta', params.to)
+  if (params.fuelType) query.set('type', params.fuelType)
+  if (params.from) query.set('from', params.from)
+  if (params.to) query.set('to', params.to)
   if (params.lng != null) query.set('lng', String(params.lng))
   if (params.lat != null) query.set('lat', String(params.lat))
   if (params.radius != null) query.set('radius', String(params.radius))
