@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState, useMemo } from 'react'
+import { useEffect, useRef, useMemo } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import type { Gasolinera } from '../types/api'
 import type { FuelType } from '../stores/useFilters'
+import { useViewport, isWithinBounds } from '../stores/useViewport'
 import styles from './StationMap.module.css'
 
 const priceIconCache = new Map<number, L.DivIcon>()
@@ -51,23 +52,33 @@ function ViewportMarkers({
   fuelType: FuelType
 }) {
   const map = useMap()
-  const [bounds, setBounds] = useState(() => map.getBounds())
+  const bounds = useViewport((s) => s.bounds)
+  const setBounds = useViewport((s) => s.setBounds)
 
   useEffect(() => {
-    const update = () => setBounds(map.getBounds())
+    const update = () => {
+      const b = map.getBounds()
+      setBounds({
+        north: b.getNorth(),
+        south: b.getSouth(),
+        east: b.getEast(),
+        west: b.getWest(),
+      })
+    }
+    update()
     map.on('moveend', update)
     map.on('zoomend', update)
     return () => {
       map.off('moveend', update)
       map.off('zoomend', update)
     }
-  }, [map])
+  }, [map, setBounds])
 
   const visible = useMemo(() => {
     return stations.filter((s) => {
       const price = s.prices[fuelType]
       if (price == null) return false
-      return bounds.contains([s.coordinates.lat, s.coordinates.lng])
+      return isWithinBounds(bounds, s.coordinates.lat, s.coordinates.lng)
     })
   }, [stations, fuelType, bounds])
 

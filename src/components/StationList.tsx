@@ -1,9 +1,10 @@
 import { useRef, useState, useCallback, useEffect, useMemo } from 'react'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import { Search, Droplets, RefreshCw } from 'lucide-react'
 import type { Gasolinera } from '../types/api'
 import type { FuelType } from '../stores/useFilters'
+import { useViewport, isWithinBounds } from '../stores/useViewport'
 import { StationCard } from './StationCard'
-import { VirtualList } from './VirtualList'
 import styles from './StationList.module.css'
 
 interface Props {
@@ -34,7 +35,7 @@ type SheetState = 'peek' | 'half' | 'full'
 const PEEK_HEIGHT = 140
 const HALF_RATIO = 0.5
 const FULL_RATIO = 0.85
-const CARD_HEIGHT = 80
+const ESTIMATED_CARD_HEIGHT = 88
 
 export function StationList({ stations, fuelType, userCoords, loading, onRefresh }: Props) {
   const sheetRef = useRef<HTMLDivElement>(null)
@@ -42,9 +43,14 @@ export function StationList({ stations, fuelType, userCoords, loading, onRefresh
   const touchStart = useRef({ y: 0, startTime: 0 })
   const [isDragging, setIsDragging] = useState(false)
 
+  const bounds = useViewport((s) => s.bounds)
+
   const sorted = useMemo(() => {
     return stations
       .filter((s) => s.prices[fuelType] != null)
+      .filter((s) =>
+        isWithinBounds(bounds, s.coordinates.lat, s.coordinates.lng),
+      )
       .map((s) => ({
         ...s,
         distance: haversineDistance(
@@ -58,9 +64,17 @@ export function StationList({ stations, fuelType, userCoords, loading, onRefresh
         if (pa !== pb) return pa - pb
         return (a.distance ?? Infinity) - (b.distance ?? Infinity)
       })
-  }, [stations, fuelType, userCoords])
+  }, [stations, fuelType, userCoords, bounds])
 
   const cheapest = sorted[0]?.prices[fuelType]
+
+  const listRef = useRef<HTMLDivElement>(null)
+  const virtualizer = useVirtualizer({
+    count: sorted.length,
+    getScrollElement: () => listRef.current,
+    estimateSize: () => ESTIMATED_CARD_HEIGHT,
+    overscan: 5,
+  })
 
   const getTargetHeight = (state: SheetState) => {
     if (state === 'full') return `${FULL_RATIO * 100}vh`
@@ -109,10 +123,13 @@ export function StationList({ stations, fuelType, userCoords, loading, onRefresh
     <div
       ref={sheetRef}
       className={`${styles.sheet} ${isDragging ? styles.dragging : ''}`}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
     >
-      <div className={styles.handle} onClick={handleDragHandle}>
+      <div
+        className={styles.handle}
+        onClick={handleDragHandle}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
         <div className={styles.handleBar} />
       </div>
 
@@ -152,20 +169,31 @@ export function StationList({ stations, fuelType, userCoords, loading, onRefresh
           <p>No se encontraron gasolineras en esta área</p>
         </div>
       ) : (
-        <div className={styles.list}>
-          <VirtualList
-            items={sorted}
-            itemHeight={CARD_HEIGHT}
-            renderItem={(s, i) => (
-              <StationCard
-                key={s.placeId}
-                station={s}
-                fuelType={fuelType}
-                rank={i + 1}
-                isCheapest={s.prices[fuelType] === cheapest && i === 0}
-              />
-            )}
-          />
+        <div ref={listRef} className={styles.list}>
+          <div
+            className={styles.listInner}
+            style={{ height: virtualizer.getTotalSize() }}
+          >
+            {virtualizer.getVirtualItems().map((vi) => {
+              const s = sorted[vi.index]
+              return (
+                <div
+                  key={s.placeId}
+                  data-index={vi.index}
+                  ref={virtualizer.measureElement}
+                  className={styles.listItem}
+                  style={{ transform: `translateY(${vi.start}px)` }}
+                >
+                  <StationCard
+                    station={s}
+                    fuelType={fuelType}
+                    rank={vi.index + 1}
+                    isCheapest={s.prices[fuelType] === cheapest && vi.index === 0}
+                  />
+                </div>
+              )
+            })}
+          </div>
         </div>
       )}
     </div>
