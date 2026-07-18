@@ -9,7 +9,15 @@ import styles from './SelectionScreen.module.css'
 export function SelectionScreen() {
   const { fuelType, radius, setFuelType, setRadius, setCoords } = useFilters()
   const { coords, loading, error, requestLocation } = useGeolocation()
-  const [radiusConfirmed, setRadiusConfirmed] = useState(false)
+  // Returning users (stored fuel type) skip straight to the location step
+  const [radiusConfirmed, setRadiusConfirmed] = useState(() => !!fuelType)
+
+  useEffect(() => {
+    if (fuelType) {
+      requestLocation()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     if (coords) {
