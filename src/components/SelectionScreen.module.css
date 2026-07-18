@@ -44,6 +44,10 @@
   text-align: center;
 }
 
+.step {
+  animation: slideIn 0.3s ease;
+}
+
 .section {
   display: flex;
   flex-direction: column;
@@ -58,61 +62,65 @@
   letter-spacing: 0.5px;
 }
 
-.button {
-  width: 100%;
-  padding: 14px 24px;
-  border-radius: var(--radius);
-  background: var(--accent);
-  color: var(--accent-fg);
-  font-size: 16px;
-  font-weight: 600;
-  transition: all 0.2s ease;
+.locationStep {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  min-height: 52px;
-  margin-top: 8px;
+  gap: 12px;
 }
 
-.button:active:not(:disabled) {
-  transform: scale(0.98);
+.locationStatus {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px;
+  border-radius: var(--radius);
+  background: var(--bg-secondary);
+  width: 100%;
+  text-align: center;
 }
 
-.button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.locationIcon {
+  color: var(--text-secondary);
 }
 
 .spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: var(--accent-fg);
+  width: 24px;
+  height: 24px;
+  border: 2.5px solid var(--border);
+  border-top-color: var(--text);
   border-radius: 50%;
-  animation: spin 0.6s linear infinite;
+  animation: spin 0.7s linear infinite;
 }
 
 .error {
   font-size: 13px;
   color: var(--danger);
-  background: var(--danger-bg);
-  padding: 10px 14px;
+}
+
+.retryBtn {
+  padding: 8px 20px;
   border-radius: var(--radius-sm);
-  text-align: center;
+  background: var(--accent);
+  color: var(--accent-fg);
+  font-size: 14px;
+  font-weight: 500;
+  transition: opacity 0.15s ease;
 }
 
-.locationOk {
-  font-size: 13px;
-  color: var(--success);
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
+.retryBtn:active {
+  opacity: 0.8;
 }
 
-.checkIcon {
-  vertical-align: middle;
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes spin {
