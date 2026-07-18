@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.5.2](https://github.com/edcastsh/gasolinazo-web/compare/v0.5.1...v0.5.2) (2026-07-18)
+
+
+### Bug Fixes
+
+* **map:** fit viewport to search radius and move zoom controls below header ([b058b04](https://github.com/edcastsh/gasolinazo-web/commit/b058b047f1985b0da14037de0bb70e951d32284e))
+
 ## [0.5.1](https://github.com/edcastsh/gasolinazo-web/compare/v0.5.0...v0.5.1) (2026-07-18)
 
 
