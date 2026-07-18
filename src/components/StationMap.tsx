@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import type { Gasolinera } from '../types/api'
@@ -30,16 +30,18 @@ function createUserIcon() {
   })
 }
 
-function RecenterMap({ center }: { center: [number, number] }) {
+function FitToRadius({
+  center,
+  radius,
+}: {
+  center: [number, number]
+  radius: number
+}) {
   const map = useMap()
-  const hasCentered = useRef(false)
 
   useEffect(() => {
-    if (!hasCentered.current) {
-      map.setView(center, 13)
-      hasCentered.current = true
-    }
-  }, [center, map])
+    map.fitBounds(L.latLng(center[0], center[1]).toBounds(radius * 2))
+  }, [map, center, radius])
 
   return null
 }
@@ -110,9 +112,10 @@ interface Props {
   userCoords: { lat: number; lng: number }
   stations: Gasolinera[]
   fuelType: FuelType
+  radius: number
 }
 
-export function StationMap({ userCoords, stations, fuelType }: Props) {
+export function StationMap({ userCoords, stations, fuelType, radius }: Props) {
   const center: [number, number] = useMemo(
     () => [userCoords.lat, userCoords.lng],
     [userCoords.lat, userCoords.lng],
@@ -130,7 +133,7 @@ export function StationMap({ userCoords, stations, fuelType }: Props) {
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         />
-        <RecenterMap center={center} />
+        <FitToRadius center={center} radius={radius} />
 
         <Marker position={center} icon={createUserIcon()}>
           <Popup>Tu ubicación</Popup>

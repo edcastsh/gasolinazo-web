@@ -8,7 +8,7 @@ import { FilterModal } from './FilterModal'
 import styles from './Dashboard.module.css'
 
 export function Dashboard() {
-  const { fuelType, coords } = useFilters()
+  const { fuelType, coords, radius } = useFilters()
   const { data: stations, isLoading, refetch, isFetching } = usePrecios()
   const [filtersOpen, setFiltersOpen] = useState(false)
 
@@ -21,6 +21,7 @@ export function Dashboard() {
         userCoords={coords}
         stations={stations ?? []}
         fuelType={fuelType}
+        radius={radius}
       />
       <StationList
         stations={stations ?? []}

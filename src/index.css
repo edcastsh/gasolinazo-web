@@ -70,6 +70,11 @@ input {
   z-index: 0;
 }
 
+/* Push Leaflet top controls below the fixed app header (60px + safe area) */
+.leaflet-top {
+  top: calc(60px + env(safe-area-inset-top, 0px));
+}
+
 .leaflet-control-zoom {
   border: none !important;
   box-shadow: var(--shadow) !important;
