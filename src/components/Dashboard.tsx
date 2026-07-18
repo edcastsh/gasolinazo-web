@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useFilters } from '../stores/useFilters'
 import { usePrecios } from '../hooks/usePrecios'
+import { useGeolocation } from '../hooks/useGeolocation'
 import { StationMap } from './StationMap'
 import { StationList } from './StationList'
 import { Header } from './Header'
@@ -8,9 +9,18 @@ import { FilterModal } from './FilterModal'
 import styles from './Dashboard.module.css'
 
 export function Dashboard() {
-  const { fuelType, coords, radius } = useFilters()
+  const { fuelType, coords, radius, setCoords } = useFilters()
   const { data: stations, isLoading, refetch, isFetching } = usePrecios()
   const [filtersOpen, setFiltersOpen] = useState(false)
+
+  // Refresh stored location silently in the background
+  const { coords: liveCoords, requestLocation } = useGeolocation()
+  useEffect(() => {
+    requestLocation()
+  }, [requestLocation])
+  useEffect(() => {
+    if (liveCoords) setCoords(liveCoords)
+  }, [liveCoords, setCoords])
 
   if (!fuelType || !coords) return null
 

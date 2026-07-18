@@ -9,6 +9,7 @@ const STORAGE_KEY = 'gasolinazo-filters'
 interface StoredFilters {
   fuelType: FuelType
   radius: RadiusValue
+  coords?: { lat: number; lng: number }
 }
 
 function loadStored(): StoredFilters | null {
@@ -23,9 +24,13 @@ function loadStored(): StoredFilters | null {
   }
 }
 
-function saveStored(fuelType: FuelType, radius: RadiusValue) {
+function saveStored(
+  fuelType: FuelType,
+  radius: RadiusValue,
+  coords?: { lat: number; lng: number },
+) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ fuelType, radius }))
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ fuelType, radius, coords }))
   } catch { /* ignore */ }
 }
 
@@ -51,19 +56,23 @@ interface FiltersState {
 export const useFilters = create<FiltersState>((set) => ({
   fuelType: stored?.fuelType ?? null,
   radius: stored?.radius ?? 5000,
-  coords: null,
+  coords: stored?.coords ?? null,
   hasHydrated: !!stored,
   setFuelType: (fuelType) => {
     set({ fuelType })
-    const { radius } = useFilters.getState()
-    saveStored(fuelType, radius)
+    const { radius, coords } = useFilters.getState()
+    saveStored(fuelType, radius, coords ?? undefined)
   },
   setRadius: (radius) => {
     set({ radius })
-    const { fuelType } = useFilters.getState()
-    if (fuelType) saveStored(fuelType, radius)
+    const { fuelType, coords } = useFilters.getState()
+    if (fuelType) saveStored(fuelType, radius, coords ?? undefined)
   },
-  setCoords: (coords) => set({ coords }),
+  setCoords: (coords) => {
+    set({ coords })
+    const { fuelType, radius } = useFilters.getState()
+    if (fuelType) saveStored(fuelType, radius, coords)
+  },
   reset: () => {
     clearStored()
     set({
